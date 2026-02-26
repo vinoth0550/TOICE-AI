@@ -337,7 +337,8 @@ async def generate_task(
     inserted_id = save_task(db_data)
 
     return {
+ 
+        "status" : "success",
         "message": "Task Report Generated Successfully",
-        
         "data": final_response
     }
