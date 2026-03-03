@@ -15,59 +15,72 @@ from gemini_service import generate_task_prd, transcribe_audio
 from database import save_task
 from utils import extract_text_from_docx, extract_text_from_pdf
 
-#
-from concurrency_limit import semaphore
+
+from concurrency_limit import semaphore,logger
 import asyncio
-#
 
-
-####
 
 from fastapi import HTTPException
 from google.genai.errors import APIError, ServerError
 
 
+
+
+
 async def safe_run_with_timeout(func, arg, timeout: int = 120):
     try:
+        
+        logger.info("Starting AI execution with timeout control...")
+
         return await asyncio.wait_for(
             asyncio.to_thread(func, arg),
             timeout=timeout
         )
 
     except ServerError as e:
-        # Gemini 503 error
+        
+        logger.error(f"503 ServerError: {e.message}")
+
         raise HTTPException(
             status_code=503,
             detail=e.message
         )
 
     except APIError as e:
-        # Gemini internal API error
+        
+        logger.error(f"G APIError: {e.message}")
+
         raise HTTPException(
             status_code=500,
             detail=e.message
         )
 
     except asyncio.TimeoutError:
+
+        logger.error("AI task timed out.")
+
         raise HTTPException(
             status_code=408,
             detail="Task timed out while generating PRD."
         )
 
     except asyncio.CancelledError:
+
+        logger.error("AI task cancelled unexpectedly.")
+
         raise HTTPException(
             status_code=500,
             detail="Task was cancelled unexpectedly."
         )
 
     except Exception as e:
+
+        logger.error(f"Unexpected error during AI execution: {str(e)}")
+
         raise HTTPException(
             status_code=500,
             detail=f"Unexpected error: {str(e)}"
         )
-
-####
-
 
 
 router = APIRouter()
@@ -78,6 +91,7 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 
 @router.post("/generate-task")
+
 async def generate_task(
     task_id:    str = Form(...),
     sender_id:  str = Form(...),
@@ -89,52 +103,83 @@ async def generate_task(
     file:       UploadFile = File(...)
 ):
         
-
-
+    logger.info(f"New request received")
     
     raw_input_text = ""
     transcript = None
     input_type = None
 
+    
+    # Check if file exists
+    if not file:
+        logger.warning("No file provided.")
+        return JSONResponse(
+            status_code=400,
+            content={
+                "status": "error",
+                "message": "Audio file is required"
+            }
+        )
 
-    if file:
-        file_path = os.path.join(UPLOAD_DIR, file.filename)
+    # Check file extension
+    if not file.filename.lower().endswith((".wav", ".mp3")):
+        logger.warning("Unsupported file type received.")
+        return JSONResponse(
+            status_code=400,
+            content={
+                "status": "error",
+                "message": "Only .wav and .mp3 audio files are supported"
+            }
+        )
 
-        with open(file_path, "wb") as buffer:
-            shutil.copyfileobj(file.file, buffer)
+    # Save file
+    file_path = os.path.join(UPLOAD_DIR, file.filename)
 
-        if file.filename.endswith(".docx"):
-            raw_input_text = extract_text_from_docx(file_path)
-            input_type = "docx"
+    with open(file_path, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
 
-        elif file.filename.endswith(".pdf"):
-            raw_input_text = extract_text_from_pdf(file_path)
-            input_type = "pdf"
+    logger.info(f"Audio file saved | filename={file.filename}")
 
-        elif file.filename.endswith(".wav") or file.filename.endswith(".mp3"):
-            audio_bytes = open(file_path, "rb").read()
-            transcript = transcribe_audio(audio_bytes)
-            raw_input_text = transcript
-            input_type = "audio"
+    # Process audio
+    logger.info("Processing AUDIO file...")
 
-        else:
-            return JSONResponse(status_code=400, content={"error": "Unsupported file type"})
-           
-    if not raw_input_text:
-        return JSONResponse(status_code=400, content={"error": "No input provided"})
+    audio_bytes = open(file_path, "rb").read()
+
+    logger.info("Starting audio transcription...")
+
+    transcript = transcribe_audio(audio_bytes)
+
+    logger.info("Audio transcription completed.")
+
+    raw_input_text = transcript
+    input_type = "audio"
+
 
     # timeout for request 
 
+
+    logger.info("Waiting in processing queue...")
+
     async with semaphore:
+         
+         logger.info("Processing started inside semaphore...")
+
+         logger.info("Calling AI to generate structured task report...")
+
          task_json = await safe_run_with_timeout(
             generate_task_prd,
             raw_input_text,
             timeout=120   # can adjust minutes
         )
+   
+    logger.info("AI response received successfully.")
 
 
 
     if "error" in task_json:
+
+        logger.error("AI returned invalid JSON structure.")
+
         return JSONResponse(
             status_code=500,
             content={"error": "AI returned invalid response", "details": task_json}
@@ -173,6 +218,7 @@ async def generate_task(
 
 
     final_response = {
+
         "task_id": task_id,
         "sender_id": sender_id,
         "to": to,
@@ -184,16 +230,22 @@ async def generate_task(
         "task_summary" : task_summary,
         "suggestions": task_json.get("suggestions"),
         "eta": eta
+    
     }
 
     db_data = {
     **final_response,
-    "raw_input": raw_input_text,
-    "transcript": transcript,
+
     "input_type": input_type
     }
 
+    logger.info(f"Saving task to database | task_id={task_id}")
+
     inserted_id = save_task(db_data)
+
+    logger.info("Task saved successfully in database.")
+
+    logger.info(f"Request completed successfully | task_id={task_id}")
 
     return {
  

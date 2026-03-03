@@ -258,7 +258,7 @@ RULES:
 - Do NOT include extra keys.
 - Do NOT return empty arrays.
 - Omit any user key if they have no tasks.
-- task_summary must be a single paragraph (no \\n, **, #, etc,..).
+- task_summary must be a single paragraph (no \\n, **, #, /,/etc,..).
 - suggestions must contain at least 2 improvements.
 
 Conversation:
@@ -281,6 +281,67 @@ Conversation:
     except:
         return {"error": "Invalid JSON", "raw": response.text}
 ###
+
+
+
+
+
+# 3rd api
+
+def generate_task_report(task_prd: dict, chats: list):
+
+    prompt = f"""
+You are a senior delivery manager.
+
+Below is the ORIGINAL TASK PRD (source of truth):
+
+{task_prd}
+
+Below are ALL TASK CHAT MESSAGES (chronological):
+
+{chats}
+
+Based on this:
+
+1. Compare PRD to_do with chats.
+2. Identify completed tasks.
+3. Identify in-progress tasks.
+4. Identify newly created tasks from chats.
+5. Provide 2-5 actionable suggestions.
+
+Return STRICT JSON only:
+
+{{
+"key_highlights": [],
+"upcoming_tasks": [],
+"suggestions": []
+}}
+
+RULES:
+- No markdown
+- No explanation
+- No extra keys
+- No empty arrays
+"""
+
+    response = client.models.generate_content(
+        model=MODEL_NAME,
+        contents=prompt,
+        config=types.GenerateContentConfig(
+            temperature=0.3,
+            response_mime_type="application/json"
+        )
+    )
+
+    try:
+        return json.loads(response.text)
+    except:
+        return {"error": "Invalid JSON", "raw": response.text}
+
+
+# 3rd api
+
+
 
 
 

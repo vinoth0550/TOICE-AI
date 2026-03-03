@@ -16,15 +16,10 @@ from database import save_prd,prd_collection
 
 from utils import extract_text_from_docx, extract_text_from_pdf
 
-#
+
 from concurrency_limit import semaphore
 import asyncio
-#
 
-
-
-
-####
 
 from fastapi import HTTPException
 from google.genai.errors import APIError, ServerError
@@ -86,7 +81,7 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 
 
-@router.post("/generate-prd")
+@router.post("/generate-opr")
 async def generate_prd_endpoint(
     project_id: str = Form(...),
     sender_id: str = Form(...),
@@ -116,12 +111,12 @@ async def generate_prd_endpoint(
     transcript = None
     input_type = None
 
-    # 1️⃣ If Text Provided
+    #  If Text Provided
     if text:
         raw_input_text = text
         input_type = "text"
 
-    # 2️⃣ If File Provided
+    #  If File Provided
     if file:
         file_path = os.path.join(UPLOAD_DIR, file.filename)
 
@@ -247,28 +242,3 @@ async def generate_prd_endpoint(
 
 
 
-@router.get("/project-reports/{project_id}")
-def get_reports(project_id: str):
-
-    reports_cursor = prd_collection.find(
-        {"project_id": project_id},
-        {
-            "_id": 0,
-            "project_id": 1,
-            "sender_id": 1,
-            "priority": 1,
-            "report_date": 1,
-            "key_insights": 1,
-            "team_tasks": 1,
-            "project_overview": 1,
-            "suggestions": 1
-        }
-    )
-
-    reports = list(reports_cursor)
-
-    return {
-        "project_id": project_id,
-        "total_reports": len(reports),
-        "reports": reports
-    }
