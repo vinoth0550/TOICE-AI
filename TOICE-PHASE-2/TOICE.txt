@@ -1,0 +1,273 @@
+GIT FLOW INSTRUCTION PRD :
+
+Input request :
+Files : 30 minutes git meeting audio
+
+
+Output response :
+{
+    "message": "PRD Generated Successfully",
+    "data": {
+        "project_name": "Project Development Workflow",
+        "date": "",
+        "requirements": [
+            "Establish a standardized Git workflow for all development teams (Backend, Mobile, Web, AI).",
+            "Each team member can only access repositories assigned to their team.",
+            "Implement a three-branch strategy: \"main\" (production), \"staging\" (demo/pre-production), and \"develop\" (development).",
+            "All current code must be pushed to the \"develop\" branch.",
+            "Developers must not work directly on the \"develop\" branch.",
+            "Create new branches for features, bug fixes, and enhancements from the \"develop\" branch.",
+            "Follow specific naming conventions for new branches (e.g., \"feature/dashboard\", \"bugfix/login-page-issue\").",
+            "Merge completed feature/bugfix/enhancement branches into the \"develop\" branch.",
+            "Developers are prohibited from directly pushing to \"staging\" or \"main\" branches.",
+            "All code promotion to \"staging\" and \"main\" must occur via Pull Requests (PRs).",
+            "Team leads are responsible for reviewing and merging PRs to \"staging\" and \"main\".",
+            "Daily code commits are mandatory.",
+            "Avoid pushing unneeded packages, build folders, or large files (e.g., node_modules, Flutter build folders, AI models) to repositories.",
+            "Maintain repository size under 100MB.",
+            "Ensure dependency files (e.g., requirements.txt for Python) are included for easy setup by new team members.",
+            "Obtain team lead permission before deleting any feature/bugfix/enhancement branches.",
+            "Code review is an integral part of the Pull Request process.",
+            "Future integration of project management features (issue reporting, task creation) within the platform.",
+            "Team leads to investigate paid GitHub versions for enhanced features like permission controls, increased space, and CI/CD pipelines."
+        ],
+        "team_tasks": [
+            "All existing code must be pushed to the \"develop\" branch by the end of today.",
+            "For all future work (features, bug fixes, enhancements), create new branches from \"develop\".",
+            "Follow specified branch naming conventions (e.g., \"feature/task-name\", \"bugfix/issue-description\").",
+            "Merge completed work from individual feature/bugfix/enhancement branches into \"develop\".",
+            "Do not directly push to \"staging\" or \"main\" branches.",
+            "Create Pull Requests to move code from \"develop\" to \"staging\".",
+            "Commit code daily.",
+            "Ensure only necessary code is pushed, excluding large packages or build artifacts (e.g., node_modules, Flutter build folders, AI model files).",
+            "Maintain dependency files (e.g., requirements.txt for Python) for easy project setup.",
+            "Obtain team lead permission before deleting any feature/bugfix/enhancement branches.",
+            "Team leads are responsible for reviewing Pull Requests and merging code to \"staging\" and \"main\".",
+            "Team leads will investigate paid GitHub versions for advanced features like permission controls, increased space, and CI/CD pipelines.",
+            "All teams must ensure proper access to assigned repositories and adhere to the new Git workflow."
+        ],
+        "eta": "",
+        "project_overview": [
+            "This document outlines the new Git workflow and branching strategy for all development teams (Backend, Mobile, Web, AI).",
+            "The workflow emphasizes a clear separation of environments using \"main\" (production), \"staging\" (pre-production/demo), and \"develop\" (development) branches.",
+            "Individual feature, bug fix, and enhancement work will be conducted in dedicated branches, merging into \"develop\" upon completion.",
+            "Direct pushes to \"staging\" and \"main\" are strictly prohibited for developers; all promotions will be managed by team leads via Pull Requests and code reviews.",
+            "Key guidelines include daily commits, managing repository size, excluding unnecessary files, and maintaining dependency lists.",
+            "The team will explore advanced GitHub features and potential upgrades to enhance control and automation in future phases.",
+            "Immediate action involves pushing all current code to the \"develop\" branch and adopting the new branching conventions for subsequent work."
+        ]
+    }
+}
+
+
+
+
+
+
+
+
+1. Input request :
+
+Text : We need to build an AI-powered PRD extraction system that takes raw dump inputs (PDF, DOCX, emails, meeting notes, scanned text, etc.) and automatically extracts structured PRD content including product overview, objectives, scope, features, functional requirements, non-functional requirements, timelines, milestones, risks, and dependencies; the project should start on 15 March 2026 with MVP expected by 30 May 2026 and final release by 30 July 2026; team allocation will be: 1 Project Manager (20% allocation, oversees delivery and stakeholder sync), 2 Backend Engineers (100% allocation for API + parsing engine), 1 NLP Engineer (100% allocation for model fine-tuning and prompt optimization), 1 Frontend Developer (75% allocation for dashboard UI), 1 QA Engineer (50% allocation from sprint 2 onward), and 1 DevOps Engineer (30% allocation for CI/CD and deployment setup); core requirements include accepting multiple file formats, handling noisy and unstructured text, identifying PRD sections even when headings are missing, generating structured JSON output, confidence scoring for extracted sections, user review/edit interface, versioning of extracted documents, and export in PDF/Doc/JSON formats; non-functional requirements include processing time under 30 seconds per 20-page document, 95% section classification accuracy, role-based access control, audit logs, and secure cloud deployment (AWS preferred); risks include inconsistent input formatting, OCR errors, ambiguous requirements language, and scalability bottlenecks; dependencies include OpenAI API (or equivalent LLM), OCR engine integration, cloud storage (S3), and authentication service; success metrics include reducing manual PRD structuring time by 70%, achieving at least 85% user approval rate on extracted structure, and supporting at least 500 documents per day by phase 2.
+
+
+
+Output response :
+{
+    "message": "PRD Generated Successfully",
+    "data": {
+        "project_name": "AI-powered PDD extraction system",
+        "date": "",
+        "requirements": [
+            "Accepting multiple file formats (PDF, DOCX, emails, meeting notes, scanned text, etc.)",
+            "Handling noisy and unstructured text",
+            "Identifying PRD sections even when headings are missing",
+            "Generating structured JSON output",
+            "Confidence scoring for extracted sections",
+            "User review/edit interface",
+            "Versioning of extracted documents",
+            "Export in PDF/Doc/JSON formats",
+            "Processing time under 30 seconds per 20-page document",
+            "95% section classification accuracy",
+            "Role-based access control",
+            "Audit logs",
+            "Secure cloud deployment (AWS preferred)"
+        ],
+        "team_tasks": [
+            "Project Manager: Oversees delivery and stakeholder sync",
+            "Backend Engineers: API + parsing engine",
+            "NLP Engineer: Model fine-tuning and prompt optimization",
+            "Frontend Developer: Dashboard UI",
+            "QA Engineer: Testing from sprint 2 onward",
+            "DevOps Engineer: CI/CD and deployment setup"
+        ],
+        "eta": "MVP expected by 30 May 2026 and final release by 30 July 2026",
+        "project_overview": [
+            "Build an AI-powered PDD extraction system that takes raw dump inputs and automatically extracts structured PRD content including product overview, objectives, scope, features, functional requirements, non-functional requirements, timelines, milestones, risks, and dependencies.",
+            "Risks: Inconsistent input formatting, OCR errors, ambiguous requirements language, scalability bottlenecks.",
+            "Dependencies: OpenAI API (or equivalent LLM), OCR engine integration, cloud storage (S3), authentication service.",
+            "Success Metrics: Reducing manual PRD structuring time by 70%, achieving at least 85% user approval rate on extracted structure, supporting at least 500 documents per day by phase 2."
+        ]
+    }
+}
+
+
+
+
+3. input request :
+
+Files : 30 minutes git meeting audio
+
+
+
+
+Output response :
+
+{
+    "message": "PRD Generated Successfully",
+    "data": {
+        "project_name": "Development Workflow Standardisation",
+        "date": "16/02/2026",
+        "requirements": [
+            "Establish a three-branch Git workflow: \"main\" (production), \"stage\" (demo/pre-production), and \"develop\" (development).",
+            "Developers must create dedicated feature/bugfix branches from \"develop\" for all new work.",
+            "Naming convention for feature branches: \"feature/feature-name\" (e.g., \"feature/dashboard\").",
+            "Naming convention for bugfix branches: \"bugfix/bug-description\" (e.g., \"bugfix/login-page-issues\").",
+            "All code changes must be merged from feature/bugfix branches into \"develop\".",
+            "Direct pushes to \"stage\" and \"main\" branches are strictly prohibited for developers.",
+            "All code movements to \"stage\" and \"main\" must be performed via Pull Requests (PRs).",
+            "Team leads are responsible for reviewing and merging PRs to \"stage\" and \"main\".",
+            "Developers must commit their code daily to their respective branches.",
+            "Repository size limit: 100MB per repository; avoid pushing unnecessary packages or build folders.",
+            "Maintain dependency files (e.g., \"requirements.txt\") for easy project setup.",
+            "Delete feature/bugfix branches after merging to \"develop\", with team lead permission.",
+            "All teams (Backend, Mobile, Web, AI) must adhere to this workflow."
+        ],
+        "team_tasks": [
+            "Developers: Push all existing code to the \"develop\" branch by today evening.",
+            "Developers: Create new branches from \"develop\" for all future development (features, bug fixes, enhancements).",
+            "Developers: Merge completed work from feature/bugfix branches to \"develop\".",
+            "Developers: Submit Pull Requests for moving code from \"develop\" to \"stage\".",
+            "Developers: Commit code daily.",
+            "Developers: Ensure only source code is pushed, excluding large packages or build artifacts, to stay within the 100MB limit.",
+            "Developers: Maintain dependency lists (e.g., \"requirements.txt\").",
+            "Developers: Obtain team lead permission before deleting merged branches.",
+            "Team Leads: Review and approve Pull Requests for merging code into \"stage\" and \"main\".",
+            "Team Leads: Manage access controls for \"stage\" and \"main\" branches.",
+            "Team Leads: Provide permission for deleting merged feature/bugfix branches.",
+            "Team Leads: Research and report on paid GitHub versions for enhanced features (e.g., permission controls, increased storage, CI/CD integration).",
+            "Project Management: Oversee the adoption and adherence to the new Git workflow.",
+            "Project Management: Facilitate resolution of workflow-related issues.",
+            "Project Management: Plan for future integration of project management tools (issue tracking, task creation) within GitHub."
+        ],
+        "eta": "17/05/2026",
+        "project_overview": [
+            "This initiative aims to standardize the Git workflow across all development teams (Backend, Mobile, Web, AI) to ensure efficient and collaborative code management.",
+            "It introduces a structured branching strategy with \"main\", \"stage\", and \"develop\" branches, complemented by dedicated feature and bugfix branches.",
+            "The workflow emphasizes a Pull Request-driven approach for critical merges to \"stage\" and \"main\", ensuring code review and quality control.",
+            "Key guidelines include daily code commits, repository size management, and proper dependency handling.",
+            "The project also outlines future plans for integrating advanced GitHub features for comprehensive project management."
+        ]
+    }
+}
+
+
+
+
+
+
+Generate report endpoint response format :
+
+
+{
+project_name = "string",
+date = "extract a date when the generate request",
+summary = [previous week summary 5 t0 8 line based on the conversation just what all happend in previous in structured paragraph]
+upcomming_tasks = [based on the requirements from the prd and conversation list out the uncompleted tasks and any new task or added in the convesation in point by point]
+overall_percentage = "matching the prd and conversation give a percentaege out of 100"
+}
+
+
+
+
+{ 
+"project_id" : "from the request get the exact id here", 
+"report_date" : "extract the date when the request hit", 
+"key_insights":["in array point by point", "short and crisp minimum 3 to 6 point is enough"],
+ "team_tasks":[["developer_team":"array each team tasks will be in there separate array by points by points" 
+["testing_team":"this is the requiremts of the test team complete tis by eod"]],
+
+ "suggestions":["2 to 5 suggestion from the ai side based on the tasks like last chatgpt suggestion in fewlines"], 
+"piriority" :"it will come from the request just paste here like project id"]
+}
+
+
+INPUT :
+
+We need to build an AI-powered PRD extraction system that takes raw dump inputs (PDF, DOCX, emails, meeting notes, scanned text, etc.) and automatically extracts structured PRD content including product overview, objectives, scope, features, functional requirements, non-functional requirements, timelines, milestones, risks, and dependencies; the project should start on 15 March 2026 with MVP expected by 30 May 2026 and final release by 30 July 2026; team allocation will be: 1 ANANDHU (20% allocation, oversees delivery and stakeholder sync), 2 AJITHAR (100% allocation for API + parsing engine), 1 TRILOK (100% allocation for model fine-tuning and prompt optimization), 1 GOKUL (75% allocation for dashboard UI), 1 HELAN MAM (50% allocation from sprint 2 onward), and YOGESH (30% allocation for CI/CD and deployment setup); core requirements include accepting multiple file formats, handling noisy and unstructured text, identifying PRD sections even when headings are missing, generating structured JSON output, confidence scoring for extracted sections, user review/edit interface, versioning of extracted documents, and export in PDF/Doc/JSON formats; non-functional requirements include processing time under 30 seconds per 20-page document, 95% section classification accuracy, role-based access control, audit logs, and secure cloud deployment (AWS preferred); risks include inconsistent input formatting, OCR errors, ambiguous requirements language, and scalability bottlenecks; dependencies include OpenAI API (or equivalent LLM), OCR engine integration, cloud storage (S3), and authentication service; success metrics include reducing manual PRD structuring time by 70%, achieving at least 85% user approval rate on extracted structure, and supporting at least 500 documents per day by phase 2.
+
+
+ 
+
+
+OUTPUT JSON RESPONSE :
+
+{
+    "message": "Task Report Generated Successfully",
+    "mongo_id": "699c19bee42db533ae934c60",
+    "data": {
+        "task_id": "0018",
+        "sender_id": "praveen",
+        "to": "AJITHAT,\nANANDHU,\nTRILOK,\nHELAN MAM,\nYOGESH,\nGOKUL",
+        "priority": "HIGH",
+        "task_date": "23/02/2026",
+        "to_do": {
+            "ANANDHU": [
+                "Oversee overall project delivery and ensure adherence to timelines (MVP by 30 May 2026, Final by 30 July 2026).",
+                "Manage all stakeholder communications and synchronization.",
+                "Monitor project progress against success metrics (70% reduction in manual PRD structuring time, 85% user approval, 500 documents/day by phase 2)."
+            ],
+            "AJITHAR": [
+                "Develop the core API for the PRD extraction system.",
+                "Build the parsing engine to handle various raw dump inputs (PDF, DOCX, emails, meeting notes, scanned text).",
+                "Ensure the API generates structured JSON output with confidence scoring for extracted sections.",
+                "Integrate the chosen OCR engine and cloud storage (AWS S3)."
+            ],
+            "TRILOK": [
+                "Fine-tune AI models for accurate PRD content extraction.",
+                "Optimize prompts for identifying PRD sections, even when headings are missing.",
+                "Achieve the target of 95% section classification accuracy.",
+                "Address challenges related to handling noisy and unstructured text inputs."
+            ],
+            "GOKUL": [
+                "Design and develop the dashboard UI for the PRD extraction system.",
+                "Implement the user review/edit interface for extracted content.",
+                "Develop features for versioning of extracted documents.",
+                "Implement export functionalities for PDF, Doc, and JSON formats.",
+                "Ensure role-based access control (RBAC) is integrated into the UI."
+            ],
+            "HELAN MAM": [
+                "Contribute to general development tasks as assigned, starting from Sprint 2.",
+                "Assist in quality assurance and testing to ensure system stability and accuracy.",
+                "Support in addressing ambiguous requirements language and refining extraction logic."
+            ],
+            "YOGESH": [
+                "Set up and configure CI/CD pipelines for efficient development and deployment.",
+                "Establish the secure cloud deployment environment, preferably on AWS.",
+                "Integrate authentication services for secure access.",
+                "Implement comprehensive audit logging mechanisms.",
+                "Address potential scalability bottlenecks in the deployment architecture."
+            ]
+        },
+        "task_summary": "The project aims to develop an AI-powered system for extracting structured PRD content from diverse unstructured inputs. Key objectives include handling multiple file formats, achieving high extraction accuracy, and providing a user-friendly interface for review and export. The project is scheduled to commence on 15 March 2026, with an MVP release by 30 May 2026 and the final release by 30 July 2026. Success will be measured by significant reductions in manual structuring time, high user approval, and the ability to process a large volume of documents daily. Core team members are allocated to API development, AI model tuning, UI development, and deployment infrastructure.",
+        "suggestions": [
+            "Conduct an immediate technical deep-dive on the integration of the OpenAI API (or equivalent LLM) and the chosen OCR engine to identify potential integration challenges and performance bottlenecks early.",
+            "Prioritize the detailed definition and documentation of the structured JSON output schema for PRD content to ensure consistency across API, model, and UI development.",
+            "Establish a clear strategy for handling ambiguous requirements language and inconsistent input formatting, potentially incorporating a human-in-the-loop feedback mechanism for continuous model improvement.",
+            "Develop a comprehensive test plan focusing on non-functional requirements such as processing time (under 30 seconds per 20-page document) and 95% section classification accuracy from the initial sprints.",
+            "Schedule regular risk assessment meetings to proactively address identified risks like OCR errors, scalability bottlenecks, and dependencies on external services."
+        ],
+        "eta": "25/02/2026"
+    }
+}
+
