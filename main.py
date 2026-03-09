@@ -1,8 +1,13 @@
 
+
+
+
+# phase 2
+
 # main.py
 
 from fastapi import FastAPI
-from routers import prd_router, task_router
+# from routers import oprs_router, task_prd_router
 
 
 from fastapi.exceptions import RequestValidationError
@@ -15,13 +20,13 @@ from concurrency_limit import logger
 
 
 from routers import task_chat_router, task_report_router
-
+from routers import  task_prd_router
 
 
 app = FastAPI()
 
-app.include_router(prd_router.router)
-app.include_router(task_router.router)
+# app.include_router(oprs_router.router)
+app.include_router(task_prd_router.router)
 
 
 app.include_router(task_chat_router.router)
