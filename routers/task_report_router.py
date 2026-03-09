@@ -1,6 +1,6 @@
 
 
-# phase 2
+# phase 2 # 
 
 # task_report_router.py
 
@@ -88,7 +88,14 @@ async def generate_task_report_endpoint(
             }
         )
 
+    # task_prd = task_doc["data"]
+
+    import json
+
     task_prd = task_doc["data"]
+
+    # Convert ObjectId to string
+    task_prd = json.loads(json.dumps(task_prd, default=str))
 
 
     ####
@@ -129,8 +136,13 @@ async def generate_task_report_endpoint(
 
     ####
 
+    # chat_texts = [
+    #     f"{chat.get('MsgFrom_id')}: {chat.get('message')}"
+    #     for chat in chats
+    # ]
+
     chat_texts = [
-        f"{chat.get('MsgFrom_id')}: {chat.get('message')}"
+        f"{str(chat.get('MsgFrom_id'))}: {chat.get('message')}"
         for chat in chats
     ]
 
