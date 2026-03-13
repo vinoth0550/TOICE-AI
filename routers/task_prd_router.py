@@ -201,39 +201,9 @@ async def generate_task(
     ## bfix
 
 
-    # # Process audio
-    # logger.info("Processing AUDIO file...")
 
-    # audio_bytes = open(file_path, "rb").read()
-
-    # logger.info("Starting audio transcription...")
-
-    # transcript = transcribe_audio(audio_bytes)
 
     logger.info("Processing AUDIO file...")
-
-    # --------------------------------
-    # SILENCE DETECTION
-    # --------------------------------
-
-    # energy = detect_silence(file_path)
-
-    # logger.info(f"Audio energy level: {energy}")
-
-    # if energy < 0.01:
-
-    #     logger.warning("Audio contains only silence")
-
-    #     return JSONResponse(
-    #         status_code=400,
-    #         content={
-    #             "status": "error",
-    #             "message": "uploaded file has no audible speech"
-    #         }
-    #     )
-
-
-    # audio_bytes = open(file_path, "rb").read()
 
 
     audio_bytes = await asyncio.to_thread(lambda: open(file_path, "rb").read())
@@ -251,32 +221,19 @@ async def generate_task(
 
     ## bfix
 
-    # logger.info("Audio transcription completed.")
-
-    # raw_input_text = transcript
-    # input_type = "audio"
-
-    # logger.info(f"Audio transcription completed | transcript={transcript}")
-
 
     logger.info(f"Transcript length: {len(transcript)} characters")
 
 
-    # --------------------------------
+    
     # TRANSCRIPT VALIDATION
-    # --------------------------------
+  
 
     if not validate_transcript(transcript):
 
         logger.warning("Transcript validation failed")
 
-        # return JSONResponse(
-        #     status_code=200,
-        #     content={
-        #         "status": "true",
-        #         "message": "uploaded file has no content please upload a valid audioble files."
-        #     }
-        # )
+
         return JSONResponse(
             status_code=200,
             content={

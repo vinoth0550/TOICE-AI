@@ -250,37 +250,6 @@ RULES:
 
 
 
-
-
-# def transcribe_audio(audio_bytes: bytes):
-
-#     start_time = time.time()
-
-#     response = client.models.generate_content(
-#         model=AUDIO_MODEL,
-#         contents=[
-#             types.Part.from_bytes(
-#                 data=audio_bytes,
-#                 mime_type="audio/wav"
-#             ),
-#             "Transcribe this audio clearly."
-#         ],
-#         config=types.GenerateContentConfig(
-#             temperature=0
-#         )
-#     )
-
-#     latency = time.time() - start_time
-
-#     track_ai_usage(
-#         endpoint="audio_transcription",
-#         response=response,
-#         latency=latency
-#     )
-
-#     return response.text
-
-
 ## bfix
 
 def transcribe_audio(audio_bytes: bytes):
