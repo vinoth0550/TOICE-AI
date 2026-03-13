@@ -16,10 +16,79 @@ from concurrency_limit import semaphore, logger
 
 
 ######
-
+from utils import (
+    
+    validate_transcript
+)
 from bson import ObjectId
 
 ######
+
+
+# mp3 #
+
+import os
+from dotenv import load_dotenv
+import requests
+from gemini_service import transcribe_audio
+
+load_dotenv()
+
+BASE_URL = os.getenv("BASE_URL")
+
+# mp3 #
+
+
+
+# mp3 #
+
+
+def download_audio(url: str):
+
+    try:
+        response = requests.get(url, timeout=30)
+        response.raise_for_status()
+
+        return response.content
+
+    except Exception as e:
+
+        logger.error(f"Audio download failed: {url} | {str(e)}")
+        return None
+
+
+# mp3 #
+
+
+
+#### To reduce the latency ####
+
+
+async def process_audio_attachment(sender, full_url):
+
+    logger.info(f"Downloading audio: {full_url}")
+
+    audio_bytes = await asyncio.to_thread(download_audio, full_url)
+
+    if not audio_bytes:
+        return None
+
+    logger.info("Transcribing audio...")
+
+    async with semaphore:
+        transcript = await asyncio.to_thread(transcribe_audio, audio_bytes)
+
+    logger.info(f"Chat audio transcript: {transcript}")
+
+    if not validate_transcript(transcript):
+        logger.warning("Chat audio contains no valid speech")
+        return None
+
+    return f"{sender} (audio): {transcript}"
+
+
+#### To reduce the latency ####
+
 
 
 router = APIRouter()
@@ -134,19 +203,140 @@ async def generate_task_report_endpoint(
 
     ####
 
-    ####
+
+
+
+
+    #### 
 
     # chat_texts = [
-    #     f"{chat.get('MsgFrom_id')}: {chat.get('message')}"
+    #     f"{str(chat.get('MsgFrom_id'))}: {chat.get('message')}"
     #     for chat in chats
     # ]
 
-    chat_texts = [
-        f"{str(chat.get('MsgFrom_id'))}: {chat.get('message')}"
-        for chat in chats
-    ]
-
     ####
+
+
+    # # mp3 #
+
+    # chat_texts = []
+
+    # for chat in chats:
+
+    #     sender = str(chat.get("MsgFrom_id"))
+
+    #     # TEXT MESSAGE
+    #     if chat.get("message"):
+    #         chat_texts.append(
+    #             f"{sender}: {chat.get('message')}"
+    #         )
+
+    #     # ATTACHMENTS
+    #     attachments = chat.get("attachments", [])
+
+    #     for file in attachments:
+
+    #         file_url = file.get("fileUrl")
+
+    #         if not file_url:
+    #             continue
+
+    #         full_url = f"{BASE_URL}/{file_url}"
+
+    #         logger.info(f"Downloading audio: {full_url}")
+
+    #         audio_bytes = download_audio(full_url)
+
+
+    # # bfix
+    #         # if audio_bytes:
+
+    #         #     logger.info("Transcribing audio...")
+
+    #         if not audio_bytes:
+    #             continue
+
+    #         logger.info("Transcribing audio...")
+    #         transcript = transcribe_audio(audio_bytes)
+
+
+
+
+    # # bfix
+    # # bfix
+
+
+    #             # transcript = transcribe_audio(audio_bytes)
+
+    #             # chat_texts.append(
+    #             #     f"{sender} (audio): {transcript}"
+    #             # )
+
+
+
+
+    #         transcript = transcribe_audio(audio_bytes)
+
+    #         logger.info(f"Chat audio transcript: {transcript}")
+
+    #         # validate transcript
+    #         if not validate_transcript(transcript):
+
+    #             logger.warning("Chat audio contains no valid speech")
+
+    #             continue   # skip this audio message
+
+
+    #         chat_texts.append(
+    #             f"{sender} (audio): {transcript}"
+    #         )
+
+    # bfix
+
+
+    #### updated chat file download to avoid the latency issues
+
+    chat_texts = []
+    tasks = []
+
+    for chat in chats:
+
+        sender = str(chat.get("MsgFrom_id"))
+
+        # TEXT MESSAGE
+        if chat.get("message"):
+            chat_texts.append(f"{sender}: {chat.get('message')}")
+
+        attachments = chat.get("attachments", [])
+
+        for file in attachments:
+
+            file_url = file.get("fileUrl")
+
+            if not file_url:
+                continue
+
+            full_url = f"{BASE_URL}/{file_url}"
+
+            tasks.append(
+                process_audio_attachment(sender, full_url)
+            )
+
+
+    # Run audio processing in parallel
+    results = await asyncio.gather(*tasks)
+
+    for r in results:
+        if r:
+            chat_texts.append(r)
+
+    #### updated chat file download to avoid the latency issues
+
+    # mp3 #
+
+
+
+
 
     # STEP 3 — Call AI
     async with semaphore:
@@ -173,7 +363,7 @@ async def generate_task_report_endpoint(
 
     ###
     final_response = {
-        "status": "success",
+        "status": "true",
         "message": "Task Report Generated Successfully",
         "data": {
             "task_id": task_id,

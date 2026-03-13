@@ -5,6 +5,19 @@ from docx import Document
 from PyPDF2 import PdfReader
 from pptx import Presentation
 
+
+
+
+
+## bfix   
+from pydub import AudioSegment
+import librosa
+import numpy as np
+import re
+## bfix   
+
+
+
 def extract_text_from_docx(path):
     doc = Document(path)
     return "\n".join([p.text for p in doc.paragraphs])
@@ -24,3 +37,59 @@ def extract_text_from_ppt(path):
             if hasattr(shape, "text"):
                 text += shape.text + "\n"
     return text
+
+
+
+
+## bfix   
+
+#  Minimum duration check
+
+
+def check_audio_duration(file_path: str, min_seconds: int = 2):
+
+    audio = AudioSegment.from_file(file_path)
+
+    duration = len(audio) / 1000
+
+    return duration >= min_seconds, duration
+
+
+
+#  Silence detection
+
+
+def detect_silence(file_path: str):
+
+    y, sr = librosa.load(file_path)
+
+    energy = np.mean(np.abs(y))
+
+    return energy
+
+
+
+#  Transcript validation
+
+
+def validate_transcript(text: str):
+
+    if not text:
+        return False
+
+    text = text.strip()
+
+    if len(text) < 10:
+        return False
+
+    words = re.findall(r'\w+', text)
+
+    if len(words) < 3:
+        return False
+
+    if "EMPTY_AUDIO" in text:
+        return False
+
+    return True
+
+## bfix
