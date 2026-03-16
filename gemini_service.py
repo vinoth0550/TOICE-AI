@@ -9,7 +9,14 @@ import os
 import json
 from dotenv import load_dotenv
 from google import genai
-from google.genai import types
+from google.genai import types       
+
+
+###
+import time 
+from AI_usage_tracker import track_ai_usage
+import time
+###
 
 load_dotenv()
 
@@ -19,8 +26,6 @@ client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 MODEL_NAME = "models/gemini-2.5-flash"
 
 AUDIO_MODEL = "models/gemini-2.5-flash"
-
-
 
 
 def generate_prd(text_input: str):
@@ -71,6 +76,12 @@ Conversation:
         )
     )
 
+
+    ##
+
+
+    ###
+
     try:
         return json.loads(response.text)
     except Exception:
@@ -119,6 +130,8 @@ Conversation:
 
 ###
 
+    start_time = time.time()
+
     response = client.models.generate_content(
         model=MODEL_NAME,
         contents=prompt,
@@ -127,6 +140,18 @@ Conversation:
             response_mime_type="application/json"
         )
     )
+
+    latency = time.time() - start_time
+
+    track_ai_usage(
+        endpoint="task_prd",
+        response=response,
+        latency=latency
+    )
+
+
+
+
 
     try:
         return json.loads(response.text)
@@ -187,6 +212,11 @@ RULES:
 - task_summary must be 1 to 5 line paragraph summarizing task progress.
 """
 
+
+
+
+    start_time = time.time()
+
     response = client.models.generate_content(
         model=MODEL_NAME,
         contents=prompt,
@@ -194,6 +224,14 @@ RULES:
             temperature=0.3,
             response_mime_type="application/json"
         )
+    )
+
+    latency = time.time() - start_time
+
+    track_ai_usage(
+        endpoint="task_report",
+        response=response,
+        latency=latency
     )
 
     try:
@@ -211,21 +249,72 @@ RULES:
 # TRANSCRIBE AUDIO
 
 
+
+
+
+# def transcribe_audio(audio_bytes: bytes):
+
+#     start_time = time.time()
+
+#     response = client.models.generate_content(
+#         model=AUDIO_MODEL,
+#         contents=[
+#             types.Part.from_bytes(
+#                 data=audio_bytes,
+#                 mime_type="audio/wav"
+#             ),
+#             "Transcribe this audio clearly."
+#         ],
+#         config=types.GenerateContentConfig(
+#             temperature=0
+#         )
+#     )
+
+#     latency = time.time() - start_time
+
+#     track_ai_usage(
+#         endpoint="audio_transcription",
+#         response=response,
+#         latency=latency
+#     )
+
+#     return response.text
+
+
+## bfix
+
 def transcribe_audio(audio_bytes: bytes):
+
+    start_time = time.time()
 
     response = client.models.generate_content(
         model=AUDIO_MODEL,
         contents=[
             types.Part.from_bytes(
                 data=audio_bytes,
-                mime_type="audio/wav"  # change if mp3 etc
+                mime_type="audio/wav"
             ),
-            "Transcribe this audio clearly."
+            """
+            If the audio contains silence, noise, or no understandable speech,
+            return exactly this word and nothing else:
+
+            EMPTY_AUDIO
+            """
         ],
         config=types.GenerateContentConfig(
             temperature=0
         )
     )
 
+    latency = time.time() - start_time
+
+    track_ai_usage(
+        endpoint="audio_transcription",
+        response=response,
+        latency=latency
+    )
+
     return response.text
 
+
+## bfix

@@ -26,6 +26,23 @@ from google.genai.errors import APIError, ServerError
 
 
 
+## bfix
+
+from utils import (
+    check_audio_duration,
+    detect_silence,
+    validate_transcript
+)
+
+## bfix
+
+
+
+
+
+
+
+
 
 async def safe_run_with_timeout(func, arg, timeout: int = 120):
     try:
@@ -125,13 +142,13 @@ async def generate_task(
         )
 
     # Check file extension
-    if not file.filename.lower().endswith((".wav", ".mp3")):
+    if not file.filename.lower().endswith((".wav", ".mp3", ".ogg")):
         logger.warning("Unsupported file type received.")
         return JSONResponse(
             status_code=400,
             content={
                 "status": "error",
-                "message": "Only .wav and .mp3 audio files are supported"
+                "message": "Only .wav, .ogg and .mp3 audio files are supported"
             }
         )
 
@@ -143,19 +160,143 @@ async def generate_task(
 
     logger.info(f"Audio file saved | filename={file.filename}")
 
-    # Process audio
+
+
+
+
+
+
+    ## bfix
+
+
+   
+    # AUDIO DURATION CHECK
+ 
+
+    valid_duration, duration = check_audio_duration(file_path)
+
+    logger.info(f"Audio duration: {duration} seconds")
+
+    if not valid_duration:
+
+        logger.warning("Audio shorter than minimum allowed duration")
+
+        return JSONResponse(
+            status_code=400,
+            content={
+                "status": "error",
+                "message": "Audio must be at least 2 seconds long."
+            }
+        )
+
+
+    ## bfix
+
+
+
+
+
+
+
+    ## bfix
+
+
+    # # Process audio
+    # logger.info("Processing AUDIO file...")
+
+    # audio_bytes = open(file_path, "rb").read()
+
+    # logger.info("Starting audio transcription...")
+
+    # transcript = transcribe_audio(audio_bytes)
+
     logger.info("Processing AUDIO file...")
 
-    audio_bytes = open(file_path, "rb").read()
+    # --------------------------------
+    # SILENCE DETECTION
+    # --------------------------------
+
+    # energy = detect_silence(file_path)
+
+    # logger.info(f"Audio energy level: {energy}")
+
+    # if energy < 0.01:
+
+    #     logger.warning("Audio contains only silence")
+
+    #     return JSONResponse(
+    #         status_code=400,
+    #         content={
+    #             "status": "error",
+    #             "message": "uploaded file has no audible speech"
+    #         }
+    #     )
+
+
+    # audio_bytes = open(file_path, "rb").read()
+
+
+    audio_bytes = await asyncio.to_thread(lambda: open(file_path, "rb").read())
 
     logger.info("Starting audio transcription...")
 
     transcript = transcribe_audio(audio_bytes)
 
-    logger.info("Audio transcription completed.")
+    ## bfix
+
+
+
+
+
+
+    ## bfix
+
+    # logger.info("Audio transcription completed.")
+
+    # raw_input_text = transcript
+    # input_type = "audio"
+
+    # logger.info(f"Audio transcription completed | transcript={transcript}")
+
+
+    logger.info(f"Transcript length: {len(transcript)} characters")
+
+
+    # --------------------------------
+    # TRANSCRIPT VALIDATION
+    # --------------------------------
+
+    if not validate_transcript(transcript):
+
+        logger.warning("Transcript validation failed")
+
+        # return JSONResponse(
+        #     status_code=200,
+        #     content={
+        #         "status": "true",
+        #         "message": "uploaded file has no content please upload a valid audioble files."
+        #     }
+        # )
+        return JSONResponse(
+            status_code=200,
+            content={
+                "status": "true",
+                "data": {
+                    "message": "upload a valid audible audio file."
+                }
+            }
+        )
 
     raw_input_text = transcript
     input_type = "audio"
+
+
+
+    ## bfix
+
+
+
+
 
 
     # timeout for request 
