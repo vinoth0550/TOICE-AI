@@ -1,6 +1,6 @@
 
-# utils.py
-
+# utils.py   16/03/2026 ofz
+ 
 from docx import Document
 from PyPDF2 import PdfReader
 from pptx import Presentation

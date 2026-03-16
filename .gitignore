@@ -1,5 +1,40 @@
-.env
-toice-env
-env
-.env.*
 
+
+# Virtual environments
+venv/
+env/
+.venv/
+tce-phase2/
+tce-venv
+tce-env
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Environment variables
+.env
+
+# IDE
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# logs
+*.log
+
+# uploads
+uploads/
+
+# build files
+dist/
+build/
+*.egg-info/
+
+# jupyter
+.ipynb_checkpoints

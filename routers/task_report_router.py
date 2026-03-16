@@ -1,6 +1,6 @@
 
 
-# phase 2 # 
+# phase 2 #  16/03/2026 ofz
 
 # task_report_router.py
 
@@ -203,142 +203,8 @@ async def generate_task_report_endpoint(
 
     ####
 
-<<<<<<< HEAD
 
 
-
-
-    #### 
-
-    # chat_texts = [
-    #     f"{str(chat.get('MsgFrom_id'))}: {chat.get('message')}"
-    #     for chat in chats
-    # ]
-
-    ####
-=======
-
-    #### updated chat file download to avoid the latency issues
-
-    chat_texts = []
-    tasks = []
-
-    for chat in chats:
-
-        sender = str(chat.get("MsgFrom_id"))
-
-        # TEXT MESSAGE
-        if chat.get("message"):
-            chat_texts.append(f"{sender}: {chat.get('message')}")
-
-        attachments = chat.get("attachments", [])
-
-        for file in attachments:
-
-            file_url = file.get("fileUrl")
-
-            if not file_url:
-                continue
-
-            full_url = f"{BASE_URL}/{file_url}"
-
-            tasks.append(
-                process_audio_attachment(sender, full_url)
-            )
-
-
-    # Run audio processing in parallel
-    results = await asyncio.gather(*tasks)
-
-    for r in results:
-        if r:
-            chat_texts.append(r)
-
-    #### updated chat file download to avoid the latency issues
-
-    # mp3 #
-
-
-
-
->>>>>>> fdd8c3161e1975852e492be722cae38dfe699b12
-
-
-    # # mp3 #
-
-    # chat_texts = []
-
-    # for chat in chats:
-
-    #     sender = str(chat.get("MsgFrom_id"))
-
-    #     # TEXT MESSAGE
-    #     if chat.get("message"):
-    #         chat_texts.append(
-    #             f"{sender}: {chat.get('message')}"
-    #         )
-
-    #     # ATTACHMENTS
-    #     attachments = chat.get("attachments", [])
-
-    #     for file in attachments:
-
-    #         file_url = file.get("fileUrl")
-
-    #         if not file_url:
-    #             continue
-
-    #         full_url = f"{BASE_URL}/{file_url}"
-
-    #         logger.info(f"Downloading audio: {full_url}")
-
-    #         audio_bytes = download_audio(full_url)
-
-
-    # # bfix
-    #         # if audio_bytes:
-
-    #         #     logger.info("Transcribing audio...")
-
-    #         if not audio_bytes:
-    #             continue
-
-    #         logger.info("Transcribing audio...")
-    #         transcript = transcribe_audio(audio_bytes)
-
-
-
-
-    # # bfix
-    # # bfix
-
-
-    #             # transcript = transcribe_audio(audio_bytes)
-
-    #             # chat_texts.append(
-    #             #     f"{sender} (audio): {transcript}"
-    #             # )
-
-
-
-
-    #         transcript = transcribe_audio(audio_bytes)
-
-    #         logger.info(f"Chat audio transcript: {transcript}")
-
-    #         # validate transcript
-    #         if not validate_transcript(transcript):
-
-    #             logger.warning("Chat audio contains no valid speech")
-
-    #             continue   # skip this audio message
-
-
-    #         chat_texts.append(
-    #             f"{sender} (audio): {transcript}"
-    #         )
-
-    # bfix
 
 
     #### updated chat file download to avoid the latency issues
