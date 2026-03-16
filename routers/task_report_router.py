@@ -203,6 +203,7 @@ async def generate_task_report_endpoint(
 
     ####
 
+<<<<<<< HEAD
 
 
 
@@ -215,6 +216,52 @@ async def generate_task_report_endpoint(
     # ]
 
     ####
+=======
+
+    #### updated chat file download to avoid the latency issues
+
+    chat_texts = []
+    tasks = []
+
+    for chat in chats:
+
+        sender = str(chat.get("MsgFrom_id"))
+
+        # TEXT MESSAGE
+        if chat.get("message"):
+            chat_texts.append(f"{sender}: {chat.get('message')}")
+
+        attachments = chat.get("attachments", [])
+
+        for file in attachments:
+
+            file_url = file.get("fileUrl")
+
+            if not file_url:
+                continue
+
+            full_url = f"{BASE_URL}/{file_url}"
+
+            tasks.append(
+                process_audio_attachment(sender, full_url)
+            )
+
+
+    # Run audio processing in parallel
+    results = await asyncio.gather(*tasks)
+
+    for r in results:
+        if r:
+            chat_texts.append(r)
+
+    #### updated chat file download to avoid the latency issues
+
+    # mp3 #
+
+
+
+
+>>>>>>> fdd8c3161e1975852e492be722cae38dfe699b12
 
 
     # # mp3 #

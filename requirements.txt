@@ -15,8 +15,16 @@ requests
 
 
 
+<<<<<<< HEAD
 ###  
 pydub
 librosa 
 numpy
 ###  
+=======
+
+pydub
+librosa 
+numpy
+
+>>>>>>> fdd8c3161e1975852e492be722cae38dfe699b12

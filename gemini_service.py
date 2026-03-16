@@ -250,6 +250,7 @@ RULES:
 
 
 
+<<<<<<< HEAD
 
 
 # def transcribe_audio(audio_bytes: bytes):
@@ -281,6 +282,8 @@ RULES:
 #     return response.text
 
 
+=======
+>>>>>>> fdd8c3161e1975852e492be722cae38dfe699b12
 ## bfix
 
 def transcribe_audio(audio_bytes: bytes):

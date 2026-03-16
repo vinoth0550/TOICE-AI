@@ -201,6 +201,7 @@ async def generate_task(
     ## bfix
 
 
+<<<<<<< HEAD
     # # Process audio
     # logger.info("Processing AUDIO file...")
 
@@ -235,6 +236,12 @@ async def generate_task(
 
     # audio_bytes = open(file_path, "rb").read()
 
+=======
+
+
+    logger.info("Processing AUDIO file...")
+
+>>>>>>> fdd8c3161e1975852e492be722cae38dfe699b12
 
     audio_bytes = await asyncio.to_thread(lambda: open(file_path, "rb").read())
 
@@ -251,6 +258,7 @@ async def generate_task(
 
     ## bfix
 
+<<<<<<< HEAD
     # logger.info("Audio transcription completed.")
 
     # raw_input_text = transcript
@@ -258,18 +266,27 @@ async def generate_task(
 
     # logger.info(f"Audio transcription completed | transcript={transcript}")
 
+=======
+>>>>>>> fdd8c3161e1975852e492be722cae38dfe699b12
 
     logger.info(f"Transcript length: {len(transcript)} characters")
 
 
+<<<<<<< HEAD
     # --------------------------------
     # TRANSCRIPT VALIDATION
     # --------------------------------
+=======
+    
+    # TRANSCRIPT VALIDATION
+  
+>>>>>>> fdd8c3161e1975852e492be722cae38dfe699b12
 
     if not validate_transcript(transcript):
 
         logger.warning("Transcript validation failed")
 
+<<<<<<< HEAD
         # return JSONResponse(
         #     status_code=200,
         #     content={
@@ -277,6 +294,9 @@ async def generate_task(
         #         "message": "uploaded file has no content please upload a valid audioble files."
         #     }
         # )
+=======
+
+>>>>>>> fdd8c3161e1975852e492be722cae38dfe699b12
         return JSONResponse(
             status_code=200,
             content={
@@ -396,7 +416,7 @@ async def generate_task(
 
     return {
  
-        "status" : "success",
+        "status" : "true",
         "message": "Task Report Generated Successfully",
         "data": final_response
     }
