@@ -17,8 +17,7 @@ from concurrency_limit import semaphore, logger
 
 ######
 from utils import (
-    
-    validate_transcript
+     validate_transcript
 )
 from bson import ObjectId
 
@@ -169,9 +168,6 @@ async def generate_task_report_endpoint(
 
     ####
 
-
-
-
     # STEP 2 — Fetch chats sorted ASC
 
     ###
@@ -202,10 +198,6 @@ async def generate_task_report_endpoint(
     )
 
     ####
-
-
-
-
 
     #### updated chat file download to avoid the latency issues
 
@@ -273,6 +265,48 @@ async def generate_task_report_endpoint(
     ###
 
 
+    ##### to avoid the emty array
+
+    # ###
+    # final_response = {
+    #     "status": "true",
+    #     "message": "Task Report Generated Successfully",
+    #     "data": {
+    #         "task_id": task_id,
+    #         "group_id": task_prd.get("group_id"),
+    #         "task_generated_date": task_prd.get("task_date"),
+    #         "priority": task_prd.get("priority"),
+    #         "key_highlights": ai_response.get("key_highlights"),
+    #         "upcoming_tasks": ai_response.get("upcoming_tasks"),
+    #         "task_summary": ai_response.get("task_summary"),
+    #         "suggestions": ai_response.get("suggestions"),
+            
+    #         "eta": task_prd.get("eta")
+    #     }
+    # }
+
+
+
+    key_highlights = ai_response.get("key_highlights")
+    upcoming_tasks = ai_response.get("upcoming_tasks")
+    suggestions = ai_response.get("suggestions")
+    task_summary = ai_response.get("task_summary")
+
+    if not key_highlights:
+        key_highlights = ["Task progress could not be clearly determined from the chat history."]
+
+    if not upcoming_tasks:
+        upcoming_tasks = ["No pending tasks identified from current discussion."]
+
+    if not suggestions:
+        suggestions = [
+            "Improve communication clarity within the team.",
+            "Ensure tasks are clearly documented and tracked."
+        ]
+
+    if not task_summary or len(task_summary.strip()) < 10:
+        task_summary = "The available chat discussion was analyzed but did not provide sufficient structured updates."
+
 
     ###
     final_response = {
@@ -283,13 +317,20 @@ async def generate_task_report_endpoint(
             "group_id": task_prd.get("group_id"),
             "task_generated_date": task_prd.get("task_date"),
             "priority": task_prd.get("priority"),
-            "key_highlights": ai_response.get("key_highlights"),
-            "upcoming_tasks": ai_response.get("upcoming_tasks"),
-            "task_summary": ai_response.get("task_summary"),
-            "suggestions": ai_response.get("suggestions"),
+            "key_highlights": key_highlights,
+            "upcoming_tasks": upcoming_tasks,
+            "task_summary": task_summary,
+            "suggestions": suggestions,
+                        
             "eta": task_prd.get("eta")
         }
     }
+
+
+
+    ##### to avoid the emty array
+
+
 
     ###
     

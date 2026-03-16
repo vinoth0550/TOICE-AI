@@ -262,12 +262,33 @@ def transcribe_audio(audio_bytes: bytes):
                 data=audio_bytes,
                 mime_type="audio/wav"
             ),
+            # """
+            # If the audio contains silence, noise, or no understandable speech,
+            # return exactly this word and nothing else:
+
+            # EMPTY_AUDIO
+            # """
             """
-            If the audio contains silence, noise, or no understandable speech,
-            return exactly this word and nothing else:
+            Transcribe the audio exactly.
+
+            If the audio contains:
+            - silence
+            - background noise
+            - music
+            - unclear speech
+            - non-understandable audio
+
+            Return exactly this:
 
             EMPTY_AUDIO
+
+            Do NOT guess words.
+            Do NOT hallucinate sentences.
+            DO NOT process the if the audio contain no audioble clear coice and words.
+            Only return real spoken words.
             """
+
+
         ],
         config=types.GenerateContentConfig(
             temperature=0
