@@ -1,7 +1,7 @@
 
 
 
-# phase 2
+# phase 2  16/03/2026 ofz
 
 # task_prd_router.py
 
@@ -35,12 +35,6 @@ from utils import (
 )
 
 ## bfix
-
-
-
-
-
-
 
 
 
@@ -162,10 +156,6 @@ async def generate_task(
 
 
 
-
-
-
-
     ## bfix
 
 
@@ -191,11 +181,6 @@ async def generate_task(
 
 
     ## bfix
-
-
-
-
-
 
 
     ## bfix
@@ -249,7 +234,7 @@ async def generate_task(
 
 
 
-    ## bfix
+    # ## bfix
 
     # logger.info("Audio transcription completed.")
 
@@ -259,7 +244,8 @@ async def generate_task(
     # logger.info(f"Audio transcription completed | transcript={transcript}")
 
 
-    logger.info(f"Transcript length: {len(transcript)} characters")
+    logger.info(f"Transcript length: {len(transcript)} characters")         
+
 
 
     # --------------------------------
@@ -282,7 +268,7 @@ async def generate_task(
             content={
                 "status": "true",
                 "data": {
-                    "message": "upload a valid audible audio file."
+                    "message": "upload a valid audioble audio file."
                 }
             }
         )
@@ -335,54 +321,98 @@ async def generate_task(
 
 
 
-    ########
+
+    ##### to avoid the emty array
+
+    # to_do_data = task_json.get("to_do", [])
 
 
+    to_do_data = task_json.get("to_do")
 
+    cleaned_to_do = []
 
-
-    to_do_data = task_json.get("to_do", [])
-
-    # If Gemini already returns list
+    # If Gemini returns list
     if isinstance(to_do_data, list):
-        cleaned_to_do = to_do_data
+        cleaned_to_do = [task for task in to_do_data if task]
 
-    # If Gemini returns dictionary (old format)
+    # If Gemini returns dict (old format)
     elif isinstance(to_do_data, dict):
-        cleaned_to_do = []
         for tasks in to_do_data.values():
             if tasks:
                 cleaned_to_do.extend(tasks)
 
-    else:
-        cleaned_to_do = []
+    # If still empty → fallback
+    if not cleaned_to_do:
+        cleaned_to_do = [
+            "Review discussion and define actionable tasks."
+        ]
+
+    ##### to avoid the emty array
+
+    # task_summary = task_json.get("task_summary", "")
+
+
+
+    task_summary = task_json.get("task_summary")
+
+    if not task_summary or len(task_summary.strip()) < 10:
+        task_summary = "The discussion was processed but did not contain enough structured information to generate detailed tasks."
+
+        # if isinstance(task_summary, str):
+    task_summary = task_summary.replace("\n", " ").strip()
+
+    ##### to avoid the emty array
 
 
 
 
-    task_summary = task_json.get("task_summary", "")
+    ##### to avoid the emty array
+    suggestions = task_json.get("suggestions")
+
+    if not suggestions or len(suggestions) == 0:
+        suggestions = [
+            "Clarify task requirements with stakeholders.",
+            "Break down the task into smaller actionable items."
+        ]
+
+    ##### to avoid the emty array
 
 
-    if isinstance(task_summary, str):
-        task_summary = task_summary.replace("\n", " ").strip()
+    ##### to avoid the emty array
 
+    # final_response = {
+    #     ###
+    #     "group_id": group_id,
+    #     ###
+    #     "task_id": task_id,
+    #     "sender_id": sender_id,
+    #     "to": to,
+    #     "priority": priority,
+    #     "task_date": task_date,
+        
+    #     "to_do": cleaned_to_do,
+    #     "type":type,
+    #     "task_summary" : task_summary,
+    #     "suggestions": task_json.get("suggestions"),
+    #     "eta": eta
+    
+    # }
+
+
+    ##### to avoid the emty array
 
     final_response = {
-        ###
-        "group_id": group_id,
-        ###
-        "task_id": task_id,
-        "sender_id": sender_id,
-        "to": to,
-        "priority": priority,
-        "task_date": task_date,
-        
-        "to_do": cleaned_to_do,
-        "type":type,
-        "task_summary" : task_summary,
-        "suggestions": task_json.get("suggestions"),
-        "eta": eta
-    
+    "group_id": group_id,
+    "task_id": task_id,
+    "sender_id": sender_id,
+    "to": to,
+    "priority": priority,
+    "task_date": task_date,
+    "to_do": cleaned_to_do,
+    "type": type,
+    "task_summary": task_summary,
+    "suggestions": suggestions,
+    "eta": eta
     }
 
     db_data = {
