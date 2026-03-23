@@ -1,7 +1,7 @@
 
 
 
-# phase 2  16/03/2026 ofz
+# phase 2  
 
 # task_prd_router.py
 
@@ -307,34 +307,7 @@ async def generate_task(
 
 
 
-
-
-
-
     ##### int-act 1.2
-
-
-    # ##### to avoid the emty array
-
-    # to_do_data = task_json.get("to_do")
-
-    # cleaned_to_do = []
-
-    # # If Gemini returns list
-    # if isinstance(to_do_data, list):
-    #     cleaned_to_do = [task for task in to_do_data if task]
-
-    # # If Gemini returns dict (old format)
-    # elif isinstance(to_do_data, dict):
-    #     for tasks in to_do_data.values():
-    #         if tasks:
-    #             cleaned_to_do.extend(tasks)
-
-    # # If still empty → fallback
-    # if not cleaned_to_do:
-    #     cleaned_to_do = [
-    #         "Review discussion and define actionable tasks."
-    #     ]
 
     # ##### to avoid the emty array
 

@@ -1,7 +1,7 @@
 
 
 
-# phase 2  16/03/2026 ofz
+# phase 2 
 
 # gemini_service.py
 
@@ -175,52 +175,6 @@ def generate_task_report(task_prd: dict, chats: list, activity_logs: list, delay
 
 ##### int-act 5.2
 
-
-
-#     prompt = f"""
-# You are a senior delivery manager.
-
-# Below is the ORIGINAL TASK PRD (source of truth):
-
-# {task_prd}
-
-# Below are ALL TASK CHAT MESSAGES (chronological):
-
-# {chats}
-
-# Based on this:
-
-# 1. Compare PRD to_do with chats.
-# 2. Identify completed tasks.
-# 3. Identify in-progress tasks.
-# 4. Identify newly created tasks from chats.
-# 5. Provide 2-5 actionable suggestions.
-# 6. provide task summary atleast 1 to 3 line based on the key highlights and upcomming tasks. don't return null.
-# 7. if the key highlights satisfied all the to_do's from the prd just wrote a upcommings task From the prd all to-do's are satisfied. no upcomming tasks are pending. rather than returning null value.
-
-# Return STRICT JSON only:
-
-# {{
-# "key_highlights": [],
-# "upcoming_tasks": [],
-# "task_summary":"",
-# "suggestions": []
-
-# }}
-
-# RULES:
-
-# - STRICT JSON only.
-# - Do NOT include markdown.
-# - Do NOT include extra keys.
-# - Do NOT return empty arrays.
-# - Do NOT return null value in any feilds.
-# - Omit any user key if they have no tasks.
-# - task summary must be in atleats 1 to 2 line 
-# - task_summary must be a single paragraph (no \\n, **, #, /,/etc,..).
-# - suggestions must contain at least 2 improvements.
-# - task_summary must be 1 to 5 line paragraph summarizing task progress.
-# """
 
 
     prompt = f"""

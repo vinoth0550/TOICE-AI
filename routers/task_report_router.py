@@ -1,6 +1,6 @@
 
 
-# phase 2 #  16/03/2026 ofz
+# phase 2 
 
 # task_report_router.py
 
@@ -13,6 +13,7 @@ import asyncio
 from database import  task_chat_collection, task_collection, task_report_collection, activity_collection  ## activity_collection for int act
 from gemini_service import generate_task_report
 from concurrency_limit import semaphore, logger
+import json
 
 
 ######
@@ -90,6 +91,126 @@ async def process_audio_attachment(sender, full_url):
 
 
 
+
+# HTML
+
+def generate_html_report(data: dict) -> str:
+
+    priority_color = {
+        "High": "#c0392b",
+        "HIGH": "#c0392b",
+        "Medium": "#f39c12",
+        "Low": "#27ae60"
+    }.get(data.get("priority"), "#1f4e79")
+
+    key_highlights_html = "".join(
+        [f"<li>{item}</li>" for item in data.get("key_highlights", [])]
+    )
+
+    upcoming_tasks_html = "".join(
+        [f"<li>{item}</li>" for item in data.get("upcoming_tasks", [])]
+    )
+
+    suggestions_html = "".join(
+        [f"<li>{item}</li>" for item in data.get("suggestions", [])]
+    )
+
+    html = f"""
+<div style="font-family:Arial, Helvetica, sans-serif; background:#0C6653; padding:20px; border-radius:10px; color:#333; max-width:800px; margin:auto;">
+
+<div style="margin-bottom:10px;">
+<h2 style="color:#ffffff; margin-bottom:3px;">📋 Task Report</h2>
+
+<p style="font-size:13px; color:#d1f2eb; margin:0;">
+
+<strong>🕒 Generated on:</strong> {data.get("task_generated_date")}
+</p>
+</div>
+
+<div style="background:#ffffff; padding:15px; border-radius:8px; margin-top:15px; box-shadow:0 2px 5px rgba(0,0,0,0.08);">
+
+<p><strong>🆔 Task ID:</strong> {data.get("task_id")}</p>
+<p><strong>👥 Group ID:</strong> {data.get("group_id")}</p>
+<p><strong>👤 Assignee:</strong> {data.get("assignee")}</p>
+
+<p>
+<strong>🔥 Priority:</strong>
+<span style="color:{priority_color}; font-weight:bold;">
+{data.get("priority")}
+</span>
+</p>
+
+<p><strong>📅 ETA:</strong> {data.get("eta")}</p>
+
+</div>
+
+
+<div style="margin-top:15px; padding:15px; background:#ffffff; border-radius:8px;">
+<h3 style="color:#1f4e79;">📌 Key Highlights</h3>
+
+<ul style="
+padding-left:18px;
+margin:0;
+line-height:1.6;
+word-break:break-word;
+overflow-wrap:anywhere;
+white-space:normal;
+">
+{key_highlights_html}
+</ul>
+
+<div style="margin-top:15px; padding:15px; background:#ffffff; border-radius:8px;">
+<h3 style="color:#1f4e79;">🔜 Upcoming Tasks</h3>
+
+<ul style="
+padding-left:18px;
+margin:0;
+line-height:1.6;
+word-break:break-word;
+overflow-wrap:anywhere;
+white-space:normal;
+">
+{upcoming_tasks_html}
+</ul>
+
+
+<div style="margin-top:15px; padding:15px; background:#ffffff; border-radius:8px;">
+<h3 style="color:#1f4e79;">📝 Task Summary</h3>
+
+<p style="
+line-height:1.7;
+margin:0;
+word-break:break-word;
+overflow-wrap:anywhere;
+white-space:normal;
+">
+{data.get("task_summary")}
+</p>
+
+</div>
+
+<div style="margin-top:15px; padding:15px; background:#ffffff; border-radius:8px;">
+<h3 style="color:#1f4e79;">🚀 Suggestions</h3>
+
+
+<ul style="
+padding-left:18px;
+margin:0;
+line-height:1.6;
+word-break:break-word;
+overflow-wrap:anywhere;
+white-space:normal;
+">
+{suggestions_html}
+</ul>
+
+
+</div>
+"""
+
+    return html.replace("\n", "")
+
+# HTML
 router = APIRouter()
 
 
@@ -158,7 +279,7 @@ async def generate_task_report_endpoint(
 
  
 
-    import json
+
 
     task_prd = task_doc["data"]
     ##### int-act 2.1
@@ -189,18 +310,7 @@ async def generate_task_report_endpoint(
     chats = list(fetch_chats)
 
 
-#### to process the task report eventhough that task_id has no chat_messgaes by using chat activities it need to generate
 
-    # if not chats:
-    #     logger.error(f"No Chats found | task_id={task_id}")
-
-    #     return JSONResponse(
-    #     status_code=404,
-    #     content={
-    #         "status": "error",
-    #         "message": "mentioned task id dont have any chat"
-    #     }
-    # )
 
     if not chats:
         logger.warning(f"No chats found, proceeding with activity logs only | task_id={task_id}")
@@ -229,19 +339,6 @@ async def generate_task_report_endpoint(
 
 
         #####  to process the only audio file in this phase 2
-
-        # for file in attachments:
-
-        #     file_url = file.get("fileUrl")
-
-        #     if not file_url:
-        #         continue
-
-        #     full_url = f"{BASE_URL}/{file_url}"
-
-        #     tasks.append(
-        #         process_audio_attachment(sender, full_url)
-        #     )
 
         for file in attachments:
 
@@ -420,6 +517,13 @@ async def generate_task_report_endpoint(
     ###
 
 
+
+    # return final_response
+    html_report = generate_html_report(final_response["data"])
+
+    final_response["html-report"] = {
+        "html": html_report
+    }
 
     return final_response
 

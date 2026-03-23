@@ -1,5 +1,5 @@
 
-# utils.py   16/03/2026 ofz
+# utils.py   
  
 from docx import Document
 from PyPDF2 import PdfReader
@@ -73,34 +73,6 @@ def detect_silence(file_path: str):
 
 
 #  Transcript validation
-
-
-# def validate_transcript(text: str):
-
-#     if not text:
-#         return False
-
-#     text = text.strip()
-
-#     if len(text) < 10:
-#         return False
-
-#     words = re.findall(r'\w+', text)
-
-#     if len(words) < 3:
-#         return False
-
-#     if "EMPTY_AUDIO" in text:
-#         return False
-
-#     return True
-
-# ## bfix
-
-
-
-
-
 
 
 def validate_transcript(text: str):
