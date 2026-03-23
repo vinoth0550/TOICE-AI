@@ -5,7 +5,8 @@ venv/
 env/
 .venv/
 tce-phase2/
-tce-env/
+tce-venv
+tce-env
 
 # Python cache
 __pycache__/

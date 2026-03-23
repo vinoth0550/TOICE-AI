@@ -38,6 +38,43 @@ from utils import (
 
 
 
+
+
+
+
+
+##### int-act 1.1
+
+
+
+
+def normalize_todo(to_do_data):
+    normalized = []
+
+    if isinstance(to_do_data, list):
+        for item in to_do_data:
+
+            if isinstance(item, str):
+                normalized.append(item)
+
+            elif isinstance(item, dict):
+                task = item.get("task")
+                if task:
+                    normalized.append(task)
+
+    if not normalized:
+        normalized = ["Review discussion and define actionable tasks."]
+
+    return [str(x).strip() for x in normalized]
+
+
+##### int-act 1.1
+
+
+
+
+
+
 async def safe_run_with_timeout(func, arg, timeout: int = 120):
     try:
         
@@ -185,41 +222,7 @@ async def generate_task(
 
     ## bfix
 
-
-    # # Process audio
-    # logger.info("Processing AUDIO file...")
-
-    # audio_bytes = open(file_path, "rb").read()
-
-    # logger.info("Starting audio transcription...")
-
-    # transcript = transcribe_audio(audio_bytes)
-
     logger.info("Processing AUDIO file...")
-
-    # --------------------------------
-    # SILENCE DETECTION
-    # --------------------------------
-
-    # energy = detect_silence(file_path)
-
-    # logger.info(f"Audio energy level: {energy}")
-
-    # if energy < 0.01:
-
-    #     logger.warning("Audio contains only silence")
-
-    #     return JSONResponse(
-    #         status_code=400,
-    #         content={
-    #             "status": "error",
-    #             "message": "uploaded file has no audible speech"
-    #         }
-    #     )
-
-
-    # audio_bytes = open(file_path, "rb").read()
-
 
     audio_bytes = await asyncio.to_thread(lambda: open(file_path, "rb").read())
 
@@ -236,33 +239,17 @@ async def generate_task(
 
     # ## bfix
 
-    # logger.info("Audio transcription completed.")
-
-    # raw_input_text = transcript
-    # input_type = "audio"
-
-    # logger.info(f"Audio transcription completed | transcript={transcript}")
-
 
     logger.info(f"Transcript length: {len(transcript)} characters")         
 
 
 
-    # --------------------------------
     # TRANSCRIPT VALIDATION
-    # --------------------------------
 
     if not validate_transcript(transcript):
 
         logger.warning("Transcript validation failed")
 
-        # return JSONResponse(
-        #     status_code=200,
-        #     content={
-        #         "status": "true",
-        #         "message": "uploaded file has no content please upload a valid audioble files."
-        #     }
-        # )
         return JSONResponse(
             status_code=200,
             content={
@@ -322,46 +309,63 @@ async def generate_task(
 
 
 
-    ##### to avoid the emty array
 
-    # to_do_data = task_json.get("to_do", [])
+
+    ##### int-act 1.2
+
+
+    # ##### to avoid the emty array
+
+    # to_do_data = task_json.get("to_do")
+
+    # cleaned_to_do = []
+
+    # # If Gemini returns list
+    # if isinstance(to_do_data, list):
+    #     cleaned_to_do = [task for task in to_do_data if task]
+
+    # # If Gemini returns dict (old format)
+    # elif isinstance(to_do_data, dict):
+    #     for tasks in to_do_data.values():
+    #         if tasks:
+    #             cleaned_to_do.extend(tasks)
+
+    # # If still empty → fallback
+    # if not cleaned_to_do:
+    #     cleaned_to_do = [
+    #         "Review discussion and define actionable tasks."
+    #     ]
+
+    # ##### to avoid the emty array
+
 
 
     to_do_data = task_json.get("to_do")
+    cleaned_to_do = normalize_todo(to_do_data)
 
-    cleaned_to_do = []
 
-    # If Gemini returns list
-    if isinstance(to_do_data, list):
-        cleaned_to_do = [task for task in to_do_data if task]
 
-    # If Gemini returns dict (old format)
-    elif isinstance(to_do_data, dict):
-        for tasks in to_do_data.values():
-            if tasks:
-                cleaned_to_do.extend(tasks)
 
-    # If still empty → fallback
-    if not cleaned_to_do:
-        cleaned_to_do = [
-            "Review discussion and define actionable tasks."
-        ]
+
+    ##### int-act 1.2
+
+
+
+
+
+
 
     ##### to avoid the emty array
-
-    # task_summary = task_json.get("task_summary", "")
-
-
 
     task_summary = task_json.get("task_summary")
 
     if not task_summary or len(task_summary.strip()) < 10:
         task_summary = "The discussion was processed but did not contain enough structured information to generate detailed tasks."
 
-        # if isinstance(task_summary, str):
+ 
     task_summary = task_summary.replace("\n", " ").strip()
 
-    ##### to avoid the emty array
+  
 
 
 
@@ -375,28 +379,8 @@ async def generate_task(
             "Break down the task into smaller actionable items."
         ]
 
-    ##### to avoid the emty array
+  
 
-
-    ##### to avoid the emty array
-
-    # final_response = {
-    #     ###
-    #     "group_id": group_id,
-    #     ###
-    #     "task_id": task_id,
-    #     "sender_id": sender_id,
-    #     "to": to,
-    #     "priority": priority,
-    #     "task_date": task_date,
-        
-    #     "to_do": cleaned_to_do,
-    #     "type":type,
-    #     "task_summary" : task_summary,
-    #     "suggestions": task_json.get("suggestions"),
-    #     "eta": eta
-    
-    # }
 
 
     ##### to avoid the emty array
@@ -430,3 +414,4 @@ async def generate_task(
         "message": "Task Report Generated Successfully",
         "data": final_response
     }
+

@@ -10,7 +10,7 @@ from fastapi.responses import JSONResponse
 from datetime import datetime
 import asyncio
 
-from database import  task_chat_collection, task_collection, task_report_collection
+from database import  task_chat_collection, task_collection, task_report_collection, activity_collection  ## activity_collection for int act
 from gemini_service import generate_task_report
 from concurrency_limit import semaphore, logger
 
@@ -119,7 +119,7 @@ async def generate_task_report_endpoint(
 
 
 
-    # STEP 1 — Fetch task PRD
+    # Fetch task PRD
 
     ###
     logger.info("Fetching task PRD from database...")
@@ -156,11 +156,16 @@ async def generate_task_report_endpoint(
             }
         )
 
-    # task_prd = task_doc["data"]
+ 
 
     import json
 
     task_prd = task_doc["data"]
+    ##### int-act 2.1
+    assignee = task_prd.get("to", "")
+    ##### int-act 2.1
+
+
 
     # Convert ObjectId to string
     task_prd = json.loads(json.dumps(task_prd, default=str))
@@ -168,7 +173,7 @@ async def generate_task_report_endpoint(
 
     ####
 
-    # STEP 2 — Fetch chats sorted ASC
+    # Fetch chats sorted ASC
 
     ###
     logger.info("Fetching task chats from database...")
@@ -184,111 +189,28 @@ async def generate_task_report_endpoint(
     chats = list(fetch_chats)
 
 
+#### to process the task report eventhough that task_id has no chat_messgaes by using chat activities it need to generate
 
+    # if not chats:
+    #     logger.error(f"No Chats found | task_id={task_id}")
+
+    #     return JSONResponse(
+    #     status_code=404,
+    #     content={
+    #         "status": "error",
+    #         "message": "mentioned task id dont have any chat"
+    #     }
+    # )
 
     if not chats:
-        logger.error(f"No Chats found | task_id={task_id}")
+        logger.warning(f"No chats found, proceeding with activity logs only | task_id={task_id}")
+        chats = []
 
-        return JSONResponse(
-        status_code=404,
-        content={
-            "status": "error",
-            "message": "mentioned task id dont have any chat"
-        }
-    )
+
+#### to process the task report eventhough that task_id has no chat_messgaes by using chat activities it need to generate
+
 
     ####
-
-
-
-
-
-    #### 
-
-    # chat_texts = [
-    #     f"{str(chat.get('MsgFrom_id'))}: {chat.get('message')}"
-    #     for chat in chats
-    # ]
-
-    ####
-
-
-    # # mp3 #
-
-    # chat_texts = []
-
-    # for chat in chats:
-
-    #     sender = str(chat.get("MsgFrom_id"))
-
-    #     # TEXT MESSAGE
-    #     if chat.get("message"):
-    #         chat_texts.append(
-    #             f"{sender}: {chat.get('message')}"
-    #         )
-
-    #     # ATTACHMENTS
-    #     attachments = chat.get("attachments", [])
-
-    #     for file in attachments:
-
-    #         file_url = file.get("fileUrl")
-
-    #         if not file_url:
-    #             continue
-
-    #         full_url = f"{BASE_URL}/{file_url}"
-
-    #         logger.info(f"Downloading audio: {full_url}")
-
-    #         audio_bytes = download_audio(full_url)
-
-
-    # # bfix
-    #         # if audio_bytes:
-
-    #         #     logger.info("Transcribing audio...")
-
-    #         if not audio_bytes:
-    #             continue
-
-    #         logger.info("Transcribing audio...")
-    #         transcript = transcribe_audio(audio_bytes)
-
-
-
-
-    # # bfix
-    # # bfix
-
-
-    #             # transcript = transcribe_audio(audio_bytes)
-
-    #             # chat_texts.append(
-    #             #     f"{sender} (audio): {transcript}"
-    #             # )
-
-
-
-
-    #         transcript = transcribe_audio(audio_bytes)
-
-    #         logger.info(f"Chat audio transcript: {transcript}")
-
-    #         # validate transcript
-    #         if not validate_transcript(transcript):
-
-    #             logger.warning("Chat audio contains no valid speech")
-
-    #             continue   # skip this audio message
-
-
-    #         chat_texts.append(
-    #             f"{sender} (audio): {transcript}"
-    #         )
-
-    # bfix
-
 
     #### updated chat file download to avoid the latency issues
 
@@ -305,11 +227,32 @@ async def generate_task_report_endpoint(
 
         attachments = chat.get("attachments", [])
 
+
+        #####  to process the only audio file in this phase 2
+
+        # for file in attachments:
+
+        #     file_url = file.get("fileUrl")
+
+        #     if not file_url:
+        #         continue
+
+        #     full_url = f"{BASE_URL}/{file_url}"
+
+        #     tasks.append(
+        #         process_audio_attachment(sender, full_url)
+        #     )
+
         for file in attachments:
 
             file_url = file.get("fileUrl")
 
             if not file_url:
+                continue
+
+            #  ONLY process audio files
+            if not file_url.lower().endswith((".mp3", ".wav", ".ogg")):
+                logger.info(f"Skipping non-audio file: {file_url}")
                 continue
 
             full_url = f"{BASE_URL}/{file_url}"
@@ -318,6 +261,7 @@ async def generate_task_report_endpoint(
                 process_audio_attachment(sender, full_url)
             )
 
+        #####  to process the only audio file in this phase 2
 
     # Run audio processing in parallel
     results = await asyncio.gather(*tasks)
@@ -334,13 +278,74 @@ async def generate_task_report_endpoint(
 
 
 
-    # STEP 3 — Call AI
+    ##### int-act 3.1
+
+   
+    # FETCH ACTIVITIES
+
+
+    activities = list(activity_collection.find({
+        "entityId": task_object_id,
+        "entityType": "TASK"
+    }).sort("meta.createdAt", 1))
+
+    activity_logs = []
+
+    for act in activities:
+        user = act.get("performedByInfo", {}).get("name", "Unknown")
+        message = act.get("message", "")
+
+        activity_logs.append(f"{user}: {message}")
+
+    logger.info(f"Activities fetched: {activity_logs}")
+
+    ##### int-act 3.1
+
+
+
+
+
+
+
+    ##### int-act 4
+
+    # DELAY DETECTION
+
+
+    
+
+    delay_info = "on_time"
+
+    eta = task_prd.get("eta")
+
+    try:
+        eta_date = datetime.strptime(eta, "%d/%m/%Y")
+        if datetime.utcnow() > eta_date:
+            delay_info = "delayed"
+    except:
+        pass
+
+    logger.info(f"Task delay status: {delay_info}")
+
+    ##### int-act 4
+
+
+
+
+    #  Call AI
+
     async with semaphore:
         ai_response = await safe_run_with_timeout(
+            # generate_task_report,
+            # task_prd,
+            # chat_texts
+
+            ##### int-act 5.1
             generate_task_report,
             task_prd,
-            chat_texts
+            chat_texts,activity_logs,delay_info
         )
+            ##### int-act 5.1
 
     if "error" in ai_response:
         return JSONResponse(
@@ -348,7 +353,7 @@ async def generate_task_report_endpoint(
             content={"error": "AI returned invalid response", "details": ai_response}
         )
 
-    # STEP 4 — Build final response
+    # Build final response
 
 
     ###
@@ -358,23 +363,6 @@ async def generate_task_report_endpoint(
 
     ##### to avoid the emty array
 
-    # ###
-    # final_response = {
-    #     "status": "true",
-    #     "message": "Task Report Generated Successfully",
-    #     "data": {
-    #         "task_id": task_id,
-    #         "group_id": task_prd.get("group_id"),
-    #         "task_generated_date": task_prd.get("task_date"),
-    #         "priority": task_prd.get("priority"),
-    #         "key_highlights": ai_response.get("key_highlights"),
-    #         "upcoming_tasks": ai_response.get("upcoming_tasks"),
-    #         "task_summary": ai_response.get("task_summary"),
-    #         "suggestions": ai_response.get("suggestions"),
-            
-    #         "eta": task_prd.get("eta")
-    #     }
-    # }
 
 
 
@@ -406,6 +394,11 @@ async def generate_task_report_endpoint(
         "data": {
             "task_id": task_id,
             "group_id": task_prd.get("group_id"),
+
+            ##### int-act 2.2
+            "assignee": assignee,
+            ##### int-act 2.2
+
             "task_generated_date": task_prd.get("task_date"),
             "priority": task_prd.get("priority"),
             "key_highlights": key_highlights,
@@ -421,9 +414,6 @@ async def generate_task_report_endpoint(
 
     ##### to avoid the emty array
 
-
-
-    ###
     
     ###
     logger.info("AI report generated successfully.")
@@ -433,3 +423,58 @@ async def generate_task_report_endpoint(
 
     return final_response
 
+
+
+# { task_id: ObjectId("69b186ab467b4a60236da6c4") } this has no chat messages
+
+
+# 69bb8c12918add7ad9fd05eb
+
+
+# 69b2531c38b684580374c4d9                            = task id to fetch task report on postman server this id has all datas like task_prd, task_chat_messages,activities in db.
+
+# { task_id: ObjectId("69b2531c38b684580374c4d9") }   = query to fetch this task related data's from the task_prd and task_chat_messages 
+
+# {entityId : ObjectId('69b2531c38b684580374c4d9')}   = to fetch this task related activities from the db
+
+
+# updated task report
+
+
+
+# {
+#     "status": "true",
+#     "message": "Task Report Generated Successfully",
+#     "data": {
+#         "task_id": "69b2531c38b684580374c4d9",
+#         "group_id": "69b24d8538b684580374bc4c",
+#         "assignee": "Abinesh Durai Tsit, me",
+#         "task_generated_date": "12/03/2026",
+#         "priority": "High",
+#         "key_highlights": [
+#             "Task was created by Avinash",
+#             "Task viewed by abinesh durai",
+#             "Task viewed by Vignesh developer",
+#             "Task reassigned by Vignesh developer (Reason: Member removed from group)",
+#             "Task audio content listened to by Vignesh developer",
+#             "All task audio content listened to by Vignesh developer"
+#         ],
+#         "upcoming_tasks": [
+#             "Finalize Q3 budget review with the finance department.",
+#             "Prepare the agenda and materials for the upcoming Project Alpha kickoff meeting.",
+#             "Follow up on outstanding vendor contracts for the Phase 2 procurement.",
+#             "Draft the weekly progress report for the executive steering committee."
+#         ],
+#         "task_summary": "The task is currently on time. The past week saw significant progress on key deliverables, with Phase 1 milestones successfully met and initial stakeholder engagement completed. We are currently transitioning into the planning stages for Phase 2, focusing on resource allocation and vendor finalization to maintain momentum and adhere to the project timeline.",
+#         "suggestions": [
+#             "Implement a more agile feedback loop with key stakeholders to address potential blockers proactively.",
+#             "Standardize documentation templates across all project phases to improve consistency and reduce onboarding time for new team members.",
+#             "Conduct a brief post-mortem on Phase 1 to capture lessons learned and apply them to subsequent phases."
+#         ],
+#         "eta": "2026-03-12"
+#     }
+# }
+
+
+
+# 69ba910693f93feb378ebc16

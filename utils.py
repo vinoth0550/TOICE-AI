@@ -18,15 +18,6 @@ import re
 
 
 
-# # for restrict emty audio proceesing prd
-# import webrtcvad
-# import wave
-# import contextlib
-# # for restrict emty audio proceesing prd
-
-
-
-
 def extract_text_from_docx(path):
     doc = Document(path)
     return "\n".join([p.text for p in doc.paragraphs])
@@ -78,6 +69,9 @@ def detect_silence(file_path: str):
 
 
 
+
+
+
 #  Transcript validation
 
 
@@ -104,7 +98,10 @@ def detect_silence(file_path: str):
 # ## bfix
 
 
-import re
+
+
+
+
 
 def validate_transcript(text: str):
 
@@ -142,13 +139,5 @@ def validate_transcript(text: str):
             return False
 
     return True
-
-
-
-
-
-
-
-
 
 

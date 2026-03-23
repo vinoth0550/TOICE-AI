@@ -7,9 +7,6 @@
 # main.py
 
 from fastapi import FastAPI
-# from routers import oprs_router, task_prd_router
-
-
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from fastapi import status
@@ -19,19 +16,18 @@ from fastapi import Request
 from concurrency_limit import logger
 
 
-from routers import task_chat_router, task_report_router
+from routers import  task_report_router
 from routers import  task_prd_router
 
 
 app = FastAPI()
 
 # app.include_router(oprs_router.router)
+
+
 app.include_router(task_prd_router.router)
 
-
-app.include_router(task_chat_router.router)
 app.include_router(task_report_router.router)
-
 
 
 
@@ -49,7 +45,7 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
             status_code=status.HTTP_400_BAD_REQUEST,
             content={
                 "status": "error",
-                "message": f"{', '.join(missing_fields)} field(s) are required"
+                "message": f"{', '.join(missing_fields)} field's are required"
             }
         )
 

@@ -27,3 +27,8 @@ task_report_collection = db["task_reports"]
 ###
 ai_usage_collection = db["ai_usage_logs"]
 ###
+
+
+#### int-act
+activity_collection = db["activities"]
+#### int-act
